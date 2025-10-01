@@ -12,11 +12,10 @@ def store(request, category_slug=None):
 
     if category_slug:   # if slug is given
         category = get_object_or_404(Category, slug=category_slug)
-        products = Product.objects.filter(category=category, is_available=True)
+        products = Product.objects.filter(category=category, is_available=True).order_by('id')
         paginator = Paginator(products, 3)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
-
         product_count = products.count()
     else:               # if no slug → show all
         products = Product.objects.all().filter(is_available=True).order_by('id')
