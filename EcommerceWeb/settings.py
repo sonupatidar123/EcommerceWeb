@@ -32,15 +32,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment; provide a secure value in production
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-please-change-me')
-
-# In production, require a secure SECRET_KEY value. Fail fast if not provided.
-if not DEBUG and (not SECRET_KEY or SECRET_KEY == 'django-insecure-please-change-me'):
-    raise ImproperlyConfigured('The SECRET_KEY environment variable must be set to a secure value in production.')
+SECRET_KEY = config('SECRET_KEY', default='p@r!y%0$7^x#b!_8v6+4q@9n&5u1e*...8292892344')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Use env var DEBUG (False by default)
 DEBUG = config('DEBUG', default=False, cast=bool)
+
+# In production, require a secure SECRET_KEY value. Fail fast if not provided.
+if not DEBUG and (not SECRET_KEY or SECRET_KEY == 'p@r!y%0$7^x#b!_8v6+4q@9n&5u1e*...8292892344'):
+    raise ImproperlyConfigured('The SECRET_KEY environment variable must be set to a secure value in production.')
 
 # Hosts allowed to serve the app. Provide as comma-separated in env.
 ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='').split(',') if h.strip()]
