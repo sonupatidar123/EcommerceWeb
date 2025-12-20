@@ -1,0 +1,53 @@
+ ==========================================
+MySQL Migration Setup Instructions
+==========================================
+
+STEP 1: Edit the .env file
+---------------------------
+Open the .env file in the project root and set your MySQL password:
+
+DB_NAME=ecommerce_db
+DB_USER=root
+DB_PASSWORD=YOUR_MYSQL_PASSWORD_HERE  <-- Replace this with your actual MySQL password
+DB_HOST=localhost
+DB_PORT=3306
+
+STEP 2: Create MySQL Database (if not exists)
+-----------------------------------------------
+Open MySQL command line or MySQL Workbench and run:
+
+CREATE DATABASE ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+STEP 3: Run Migration Script
+-----------------------------
+python migrate_to_mysql.py
+
+This will:
+- Create the database if it doesn't exist
+- Test the MySQL connection
+- Run all Django migrations
+- Create all necessary tables
+
+STEP 4: Create Superuser (Optional)
+-------------------------------------
+python manage.py createsuperuser
+
+STEP 5: Start Server
+--------------------
+python manage.py runserver
+
+==========================================
+Troubleshooting
+==========================================
+
+If you get "Access denied" error:
+- Make sure MySQL server is running
+- Check your password in .env file
+- Verify you can connect to MySQL using MySQL client
+
+If database doesn't exist:
+- Create it manually using the SQL command in Step 2
+- Or update DB_NAME in .env to use an existing database
+
+==========================================
+

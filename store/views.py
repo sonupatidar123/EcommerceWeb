@@ -17,20 +17,33 @@ from orders.models import OrderProduct
 def store(request, category_slug=None):
     categories = None
     products = None
-
+    # Base queryset depending on category
     if category_slug:   # if slug is given
         category = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=category, is_available=True).order_by('id')
-        paginator = Paginator(products, 3)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-        product_count = products.count()
     else:
         products = Product.objects.all().filter(is_available=True).order_by('id')
-        paginator = Paginator(products, 3)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-        product_count = products.count()
+
+    # Price range filtering via GET params (min_price and max_price)
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    try:
+        if min_price:
+            # allow values like "2000" (we render "₹2000+" in the UI)
+            min_val = int(str(min_price).replace('+', '').strip())
+            products = products.filter(price__gte=min_val)
+        if max_price:
+            max_val = int(str(max_price).replace('+', '').strip())
+            products = products.filter(price__lte=max_val)
+    except ValueError:
+        # ignore malformed inputs and continue with unfiltered queryset
+        pass
+
+    # Pagination
+    paginator = Paginator(products, 3)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+    product_count = products.count()
 
     context = {
         'products': paged_products,

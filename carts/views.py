@@ -62,8 +62,8 @@ def add_cart(request, product_id):
                 user = current_user,
             )
             if len(product_variation) > 0:
-                cart_item.variations.clear()
-                cart_item.variations.add(*product_variation)
+                cart_item.variation.clear()
+                cart_item.variation.add(*product_variation)
             cart_item.save()
         return redirect('cart')
     # If the user is not authenticated
@@ -234,4 +234,5 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'tax'       : tax,
         'grand_total': grand_total,
     }
-    return render(request, 'store/checkout.html', context)
+    # Template filename in repo is `check_out.html` (underscore). Use that to avoid TemplateDoesNotExist.
+    return render(request, 'store/check_out.html', context)

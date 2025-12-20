@@ -89,3 +89,15 @@ class UserProfile(models.Model):
 
     def full_address(self):
         return f'{self.address_line_1} {self.address_line_2}'
+
+
+# Create a UserProfile automatically when a new Account is created
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=Account)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        # create a profile with default values; this avoids DoesNotExist errors
+        UserProfile.objects.create(user=instance, profile_picture='default/default-user.png')

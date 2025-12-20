@@ -20,6 +20,10 @@ import requests
 
 
 def register(request):
+    # Redirect if user is already logged in
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -40,18 +44,24 @@ def register(request):
             profile.save()
 
             # USER ACTIVATION
-            current_site = get_current_site(request)
-            mail_subject = 'Please activate your account'
-            message = render_to_string('accounts/account_verification_email.html', {
-                'user': user,
-                'domain': current_site,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            to_email = email
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            send_email.send()
-            # messages.success(request, 'Thank you for registering with us. We have sent you a verification email to your email address [rathan.kumar@gmail.com]. Please verify it.')
+            try:
+                current_site = get_current_site(request)
+                mail_subject = 'Please activate your account'
+                message = render_to_string('accounts/accounts_verification_email.html', {
+                    'user': user,
+                    'domain': current_site,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                to_email = email
+                send_email = EmailMessage(mail_subject, message, to=[to_email])
+                send_email.send()
+                messages.success(request, 'Thank you for registering with us. We have sent you a verification email to your email address. Please verify it.')
+            except Exception as e:
+                # If email sending fails, still allow registration but log the error
+                messages.warning(request, 'Registration successful, but verification email could not be sent. Please contact support.')
+                print(f"Email sending error: {e}")
+            
             return redirect('/accounts/login/?command=verification&email='+email)
     else:
         form = RegistrationForm()
@@ -62,6 +72,10 @@ def register(request):
 
 
 def login(request):
+    # Redirect if user is already logged in
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
@@ -154,8 +168,17 @@ def activate(request, uidb64, token):
 def dashboard(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     orders_count = orders.count()
-
-    userprofile = UserProfile.objects.get(user_id=request.user.id)
+    # Ensure a UserProfile exists for the current user. If it doesn't, create one
+    # with a default profile picture so templates that reference
+    # `userprofile.profile_picture.url` do not raise ValueError.
+    userprofile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'profile_picture': 'default/default-user.png'}
+    )
+    # If the profile exists but has no picture set, assign the default and save.
+    if not userprofile.profile_picture:
+        userprofile.profile_picture = 'default/default-user.png'
+        userprofile.save()
     context = {
         'orders_count': orders_count,
         'userprofile': userprofile,

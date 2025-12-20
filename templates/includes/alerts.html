@@ -1,10 +1,10 @@
-{% autoescape off %}
-
-Hi {{user.first_name}},
-
-As requested, please click below link to reset your password.
-http://{{domain}}{% url 'resetpassword_validate' uidb64=uid token=token %}
-
-If you think it's not you, please ignore this email.
-
-{% endautoescape %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+{% endif %}
