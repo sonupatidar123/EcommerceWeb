@@ -9,6 +9,9 @@ tzdata==2025.2
 virtualenv==20.34.0
 gunicorn==21.2.0
 whitenoise==6.5.0
+PyMySQL==1.1.2
+python-decouple==3.8
+dj-database-url==1.0.0
 
 
 
