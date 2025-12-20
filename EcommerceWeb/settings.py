@@ -14,6 +14,7 @@ from pathlib import Path
 from decouple import config
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # PyMySQL configuration for MySQL
 try:
@@ -32,6 +33,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read from environment; provide a secure value in production
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-please-change-me')
+
+# In production, require a secure SECRET_KEY value. Fail fast if not provided.
+if not DEBUG and (not SECRET_KEY or SECRET_KEY == 'django-insecure-please-change-me'):
+    raise ImproperlyConfigured('The SECRET_KEY environment variable must be set to a secure value in production.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Use env var DEBUG (False by default)
@@ -203,6 +208,9 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = int(config('SECURE_HSTS_SECONDS', default=31536000))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
     SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
+    # If running behind a proxy (e.g., Heroku, load balancer) enable this via env
+    if config('USE_X_FORWARDED_PROTO', default=False, cast=bool):
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Email configuration (for development - uses console backend)
 # For production, configure SMTP settings
