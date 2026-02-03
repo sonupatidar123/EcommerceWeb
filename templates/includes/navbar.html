@@ -47,26 +47,31 @@
 		</div>  <!-- category-wrap.// -->
 	</div> <!-- col.// -->
 	<a href="{% url 'store'%}" class="btn btn-outline-primary">Store</a>
-	<div class="col-lg  col-md-6 col-sm-12 col">
-		<form action="{%url 'search' %}" class="search" method='GET'>
-			<div class="input-group w-100">
-			    <input type="text" class="form-control" style="width:60%;" placeholder="Search" name="keyword">
+	<div class="col-lg col-md-6 col-12 search-container">
+		<form action="{% url 'search' %}" class="search-form" method="GET" id="search-form">
+			<div class="input-group search-group">
+			    <input type="text" 
+			           class="form-control search-input search-input-lg" 
+			           placeholder="Search products..." 
+			           name="keyword"
+			           id="search-input"
+			           autocomplete="off">
 			    
 			    <div class="input-group-append">
-			      <button class="btn btn-primary" type="submit">
-			        <i class="fa fa-search"></i>
+			      <button class="btn btn-search btn-search-lg" type="submit" title="Search products">
+			        <i class="fa fa-search"></i> Search
 			      </button>
 			    </div>
 		    </div>
-		</form> <!-- search-wrap .end// -->
+		</form>
 	</div> <!-- col.// -->
-	<div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
-				<div class="d-flex justify-content-end mb-3 mb-lg-0">
+	<div class="col-lg-3 col-md-12 col-12 order-2 order-lg-3 mt-2 mt-lg-0">
+				<div class="d-flex justify-content-between justify-content-lg-end align-items-flex-start mb-3 mb-lg-0">
 					<div class="widget-header">
 						<small class="title text-muted">Welcome guest!</small>
-						<div> 
-							<a href="{% url 'login' %}">Sign in</a> <span class="dark-transp"> | </span>
-							<a href="{% url 'register' %}"> Register</a>
+						<div class="mt-2"> 
+							<a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary mr-2">Sign in</a>
+							<a href="{% url 'register' %}" class="btn btn-sm btn-primary">Register</a>
 						</div>
 					</div>
 					<a href="{%url 'cart'%}" class="widget-header pl-3 ml-3">

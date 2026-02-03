@@ -84,14 +84,29 @@ def product_detail(request, category_slug, product_slug):
 
 
 def search(request):
+    products = []
+    product_count = 0
+    keyword = ''
+    
     if 'keyword' in request.GET:
-        keyword = request.GET['keyword']
+        keyword = request.GET['keyword'].strip()
         if keyword:
-            products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
+            # Search in product name and description
+            products = Product.objects.filter(
+                Q(product_name__icontains=keyword) | 
+                Q(description__icontains=keyword)
+            ).filter(is_available=True).order_by('-created_date')
             product_count = products.count()
+            
+            # Pagination
+            paginator = Paginator(products, 12)
+            page = request.GET.get('page')
+            products = paginator.get_page(page)
+    
     context = {
         'products': products,
         'product_count': product_count,
+        'keyword': keyword,
     }
     return render(request, 'store/store.html', context)
 

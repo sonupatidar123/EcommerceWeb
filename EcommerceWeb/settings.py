@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
-import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, '.env'))
 
 # PyMySQL configuration for MySQL
 try:
@@ -25,27 +27,26 @@ except ImportError:
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Read from environment; provide a secure value in production
-SECRET_KEY = config('SECRET_KEY', default='p@r!y%0$7^x#b!_8v6+4q@9n&5u1e*...8292892344')
+# SECRET_KEY = 'django-insecure-3^sn7w3%w^vghn(t2w)&tgb50$skwaw^aij!za9wyezhx59q0r'
+SECRET_KEY = config('SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Use env var DEBUG (False by default)
-DEBUG = config('DEBUG', default=False, cast=bool)
 
-# In production, require a secure SECRET_KEY value. Fail fast if not provided.
-if not DEBUG and (not SECRET_KEY or SECRET_KEY == 'p@r!y%0$7^x#b!_8v6+4q@9n&5u1e*...8292892344'):
-    raise ImproperlyConfigured('The SECRET_KEY environment variable must be set to a secure value in production.')
+# ALLOWED_HOSTS = ['sonupatidar01.pythonanywhere.com']
+ALLOWED_HOSTS = [
+    'sonupatidar01.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+]
 
-# Hosts allowed to serve the app. Provide as comma-separated in env.
-ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='').split(',') if h.strip()]
-
-# If ALLOWED_HOSTS not set, keep empty list (recommended for production)
 
 
 # Application definition
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     'store',
     'carts',
     'orders',
+    'payments',
     
 ]
 
@@ -119,20 +121,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 # .env file) and provide DB_NAME, DB_USER, DB_PASSWORD, DB_HOST and DB_PORT.
 USE_MYSQL = config('USE_MYSQL', default=False, cast=bool)
 
-# Default: SQLite for local development
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# If a DATABASE_URL is provided (common in hosting), use it to configure DB
-DATABASE_URL = config('DATABASE_URL', default='')
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-elif USE_MYSQL:
-    # Fallback to explicit MySQL environment variables
+if USE_MYSQL:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -145,6 +134,14 @@ elif USE_MYSQL:
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
                 'charset': 'utf8mb4',
             },
+        }
+    }
+else:
+    # Development default: SQLite (no external DB credentials required)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -193,24 +190,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'EcommerceWeb/static'
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'EcommerceWeb/static'
+# ]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Use compressed manifest storage for production-ready static serving (WhiteNoise)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Security settings for production
-if not DEBUG:
-    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
-    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
-    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
-    SECURE_HSTS_SECONDS = int(config('SECURE_HSTS_SECONDS', default=31536000))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
-    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
-    # If running behind a proxy (e.g., Heroku, load balancer) enable this via env
-    if config('USE_X_FORWARDED_PROTO', default=False, cast=bool):
-        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Email configuration (for development - uses console backend)
 # For production, configure SMTP settings
@@ -220,4 +206,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-
+# Razorpay Payment Gateway Configuration
+# Get these credentials from your Razorpay dashboard: https://dashboard.razorpay.com
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='')

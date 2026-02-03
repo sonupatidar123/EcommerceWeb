@@ -37,11 +37,16 @@ def register(request):
             user.phone_number = phone_number
             user.save()
 
-            # Create a user profile
-            profile = UserProfile()
-            profile.user_id = user.id
-            profile.profile_picture = 'default/default-user.png'
-            profile.save()
+            # # Create a user profile
+            # profile = UserProfile()
+            # profile.user_id = user.id
+            # profile.profile_picture = 'default/default-user.png'
+            # profile.save()
+            UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'profile_picture': 'default/default-user.png'}
+            )
+
 
             # USER ACTIVATION
             try:

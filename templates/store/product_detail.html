@@ -6,19 +6,17 @@
 <div class="container">
 
 <!-- ============================ COMPONENT 1 ================================= -->
-    <div class="card">
-    	<div class="row no-gutters">
-        	<aside class="col-12 col-md-6">
+<div class="card">
+	<div class="row no-gutters">
+		<aside class="col-md-6">
 <article class="gallery-wrap"> 
-	<div class="img-big-wrap text-center" style="padding:10px;background:#fff; border:1px solid #f0f0f0;">
-	   <a href="#">
-		   <img src="{{ single_product.images.url }}" class="img-fluid" alt="{{ single_product.product_name }}" style="max-width:100%; max-height:480px; object-fit:contain; display:inline-block;">
-	   </a>
-	</div> <!-- img-big-wrap.// -->                                
-
+	<div class="img-big-wrap">
+	   <a href="#"><img src={{single_product.images.url}}></a>
+	</div> <!-- img-big-wrap.// -->                               
+	
 </article> <!-- gallery-wrap .end// -->
 		</aside>
-			<main class="col-12 col-md-6 border-left">
+		<main class="col-md-6 border-left">
 <form  action="{% url 'add_cart' single_product.id %}"  method="POST">
     {% csrf_token %}
     <article class="content-body">
@@ -99,9 +97,9 @@
 				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 				quis nostrud exercitation ullamco laboris nisi ut aliquip
 			</p>	
-		</div> </article>
+		</div>-	</article>
+
 	
-		
 
 	</div> <!-- col.// -->
 </div> <!-- row.// -->
